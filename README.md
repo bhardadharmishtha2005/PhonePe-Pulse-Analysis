@@ -1,5 +1,5 @@
-# 📊 PhonePe Pulse: Data Visualization & Prediction 🇮🇳
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](YOUR_COLAB_LINK_HERE)
+# PhonePe Pulse: Data Visualization & Prediction 🇮🇳
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/14gPwLrwYVbAo06DT5QOJVftacdLBOAvi)
 
 ## Project Overview
 An end-to-end Data Science project developed during my **AI/ML Internship at Labmentix**. This project analyzes India's digital payment landscape using the PhonePe Pulse dataset (2018-2024) and deploys a high-precision XGBoost model to forecast transaction trends.

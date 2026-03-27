@@ -65,4 +65,3 @@ with col2:
             st.error(f"Prediction Error: {e}")
 
 st.markdown("---")
-st.caption("Developed by Bharda Dharmishtha Mahendrabhai | AI/ML Intern @ Labmentix")

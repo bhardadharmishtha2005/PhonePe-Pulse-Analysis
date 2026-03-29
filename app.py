@@ -11,20 +11,48 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Custom CSS - Fixed the "White Text" visibility issue
+# 2. Advanced CSS for a Clean White "Apple-Style" UI
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; }
-    /* This makes the metric text dark so it shows up on the white background */
+    /* Main background */
+    .stApp {
+        background-color: #FFFFFF;
+    }
+    /* Sidebar styling */
+    section[data-testid="stSidebar"] {
+        background-color: #F8F9FA;
+        border-right: 1px solid #E9ECEF;
+    }
+    /* Metric Card Styling */
     [data-testid="stMetricValue"] {
-        color: #1f1f1f !important;
-        font-weight: bold;
+        color: #5F259F !important; /* PhonePe Purple */
+        font-weight: 800;
     }
     .stMetric { 
-        background-color: #ffffff; 
-        padding: 20px; 
-        border-radius: 12px; 
-        border: 1px solid #d1d1d1;
+        background-color: #FFFFFF; 
+        padding: 25px; 
+        border-radius: 15px; 
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        border: 1px solid #F1F3F5;
+    }
+    /* Button Styling */
+    .stButton>button {
+        background-color: #5F259F;
+        color: white;
+        border-radius: 8px;
+        border: none;
+        padding: 0.5rem 1rem;
+        transition: 0.3s;
+    }
+    .stButton>button:hover {
+        background-color: #451a75;
+        border: none;
+        color: white;
+    }
+    /* Headers */
+    h1, h2, h3 {
+        color: #212529;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -36,33 +64,35 @@ def load_prediction_model():
 
 model = load_prediction_model()
 
-# 4. Simplified Sidebar (Removed Personal Info)
+# 4. Sidebar - Clean Text Only
 with st.sidebar:
-    st.markdown("### **Project Insight**")
-    st.write("This AI-powered tool analyzes historical UPI trends to forecast future transaction volumes across India.")
+    st.markdown("## 📊 **Project Pulse**")
+    st.write("An AI-powered forecasting tool developed for the **Labmentix** internship program.")
     st.divider()
-    st.caption("Status: Model Deployment Live ✅")
+    st.markdown("#### **System Status**")
+    st.success("Model Live & Ready")
+    st.caption("Version 1.0.2")
 
-# 5. Main UI Header
-st.title("💳 PhonePe Pulse: Transaction Prediction Dashboard")
-st.write("Enter the parameters below to generate a real-time financial forecast.")
+# 5. Main UI
+st.title("💳 PhonePe Pulse: Transaction Prediction")
+st.markdown("##### Fill in the parameters to generate an AI-driven financial forecast.")
 st.divider()
 
-# 6. Input Columns
+# 6. Layout
 col1, col2 = st.columns([1, 1], gap="large")
 
 with col1:
-    st.subheader("📊 Input Parameters")
+    st.subheader("📍 Parameters")
     trans_count = st.number_input("Total Transaction Count", value=5000, step=500)
-    year = st.select_slider("Select Fiscal Year", options=list(range(2018, 2027)), value=2024)
-    quarter = st.radio("Select Quarter", [1, 2, 3, 4], horizontal=True)
+    year = st.select_slider("Fiscal Year", options=list(range(2018, 2027)), value=2024)
+    quarter = st.radio("Quarter", [1, 2, 3, 4], horizontal=True)
     est_volume = st.number_input("Average Expected Volume (₹)", value=100000)
 
 with col2:
-    st.subheader("🎯 Prediction Result")
+    st.subheader("🎯 Result")
     
-    if st.button("Generate Forecast", type="primary"):
-        # Engineering features for 11-column shape
+    if st.button("Generate Forecast", use_container_width=True):
+        # Feature Engineering (11 columns)
         avg_atv = est_volume / (trans_count + 1e-6)
         timeline = (year - 2018) * 4 + quarter
         
@@ -75,31 +105,35 @@ with col2:
         
         try:
             prediction = model.predict(input_data)
-            # Using expm1 because of Log Transformation during training
             final_val = np.expm1(prediction[0]) 
 
-            # Display Result with proper visibility
+            # Result Display
             st.metric(
-                label="Predicted Transaction Value", 
+                label="Estimated Transaction Value", 
                 value=f"₹{final_val:,.2f}",
-                delta=f"Forecast for Q{quarter} {year}"
+                delta=f"Based on Q{quarter} {year} Trends"
             )
             
-            st.success("Analysis complete! Result based on optimized XGBoost parameters.")
-            
-            # Feature Importance Visualization
+            # Feature Importance Chart (Clean White Theme)
             st.write("---")
             impact_data = pd.DataFrame({
-                'Feature': ['Volume', 'Timeline', 'Year', 'Quarter', 'Ticket Size'],
+                'Feature': ['Volume', 'Time', 'Year', 'Quarter', 'Size'],
                 'Weight': [0.45, 0.25, 0.15, 0.10, 0.05]
-            })
-            fig = px.bar(impact_data, x='Weight', y='Feature', orientation='h', 
-                         color='Weight', color_continuous_scale='Bluered',
-                         title="Model Driver Analysis")
+            }).sort_values('Weight')
+            
+            fig = px.bar(impact_data, x='Weight', y='Feature', orientation='h',
+                         template='plotly_white', # White template
+                         color_discrete_sequence=['#5F259F']) # Purple color
+            
+            fig.update_layout(
+                title="Model Driver Intensity",
+                margin=dict(l=20, r=20, t=40, b=20),
+                height=300
+            )
             st.plotly_chart(fig, use_container_width=True)
 
         except Exception as e:
-            st.error(f"Error: {e}")
+            st.error(f"Error during prediction: {e}")
 
 st.divider()
-st.caption("© 2026 PhonePe Pulse ML Portfolio Project")
+st.caption("AI/ML Internship Project | © 2026 Digital India Analytics")

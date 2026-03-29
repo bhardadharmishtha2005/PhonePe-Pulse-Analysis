@@ -38,8 +38,6 @@ model = load_prediction_model()
 
 # 4. Simplified Sidebar (Removed Personal Info)
 with st.sidebar:
-    # Change the sidebar image line to this:
-    st.sidebar.image("https://raw.githubusercontent.com/pmndrs/market/main/phonepe.png", width=180)
     st.markdown("### **Project Insight**")
     st.write("This AI-powered tool analyzes historical UPI trends to forecast future transaction volumes across India.")
     st.divider()

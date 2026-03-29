@@ -11,48 +11,51 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Advanced CSS for a Clean White "Apple-Style" UI
+# 2. Professional UI Styling (Fixed Visibility & Layout)
 st.markdown("""
     <style>
-    /* Main background */
+    /* Main Page Background (Soft Grey) */
     .stApp {
-        background-color: #FFFFFF;
+        background-color: #f8f9fa;
     }
-    /* Sidebar styling */
-    section[data-testid="stSidebar"] {
-        background-color: #F8F9FA;
-        border-right: 1px solid #E9ECEF;
+    
+    /* Fixing Text Visibility - Force Dark Color for all text */
+    h1, h2, h3, p, span, label {
+        color: #1a1a1a !important;
     }
-    /* Metric Card Styling */
+
+    /* Input Card Styling */
+    [data-testid="stVerticalBlock"] > div:contains("Parameters") {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    /* Metric Result Styling */
     [data-testid="stMetricValue"] {
-        color: #5F259F !important; /* PhonePe Purple */
-        font-weight: 800;
+        color: #5f259f !important;
+        font-weight: 800 !important;
+        font-size: 2.5rem !important;
     }
+    
     .stMetric { 
-        background-color: #FFFFFF; 
+        background-color: #ffffff; 
         padding: 25px; 
         border-radius: 15px; 
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        border: 1px solid #F1F3F5;
+        box-shadow: 0 10px 25px rgba(95, 37, 159, 0.1);
+        border: 1px solid #e0e0e0;
     }
-    /* Button Styling */
+
+    /* Button Styling (PhonePe Purple) */
     .stButton>button {
-        background-color: #5F259F;
-        color: white;
-        border-radius: 8px;
+        background-color: #5f259f !important;
+        color: white !important;
+        border-radius: 10px;
         border: none;
-        padding: 0.5rem 1rem;
-        transition: 0.3s;
-    }
-    .stButton>button:hover {
-        background-color: #451a75;
-        border: none;
-        color: white;
-    }
-    /* Headers */
-    h1, h2, h3 {
-        color: #212529;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+        font-weight: bold;
+        width: 100%;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -64,35 +67,37 @@ def load_prediction_model():
 
 model = load_prediction_model()
 
-# 4. Sidebar - Clean Text Only
+# 4. Sidebar
 with st.sidebar:
     st.markdown("## 📊 **Project Pulse**")
-    st.write("An AI-powered forecasting tool developed for the **Labmentix** internship program.")
+    st.write("AI-powered financial forecasting for digital transactions.")
     st.divider()
-    st.markdown("#### **System Status**")
-    st.success("Model Live & Ready")
-    st.caption("Version 1.0.2")
+    st.success("System: Model Ready")
 
-# 5. Main UI
-st.title("💳 PhonePe Pulse: Transaction Prediction")
-st.markdown("##### Fill in the parameters to generate an AI-driven financial forecast.")
-st.divider()
+# 5. Main Header
+st.title("💳 PhonePe Pulse: Transaction Forecast")
+st.write("Adjust the variables below to predict transaction trends.")
+st.markdown("---")
 
-# 6. Layout
-col1, col2 = st.columns([1, 1], gap="large")
+# 6. Two-Column Layout
+col1, col2 = st.columns([1, 1.2], gap="large")
 
 with col1:
-    st.subheader("📍 Parameters")
-    trans_count = st.number_input("Total Transaction Count", value=5000, step=500)
-    year = st.select_slider("Fiscal Year", options=list(range(2018, 2027)), value=2024)
-    quarter = st.radio("Quarter", [1, 2, 3, 4], horizontal=True)
-    est_volume = st.number_input("Average Expected Volume (₹)", value=100000)
+    st.subheader("📍 Input Parameters")
+    # Wrap inputs in a container for styling
+    with st.container():
+        trans_count = st.number_input("Total Transaction Count", value=5000, step=500)
+        year = st.select_slider("Select Year", options=list(range(2018, 2027)), value=2024)
+        quarter = st.radio("Select Quarter", [1, 2, 3, 4], horizontal=True)
+        est_volume = st.number_input("Average Regional Volume (₹)", value=100000)
+        
+        predict_btn = st.button("Generate Forecast Now")
 
 with col2:
-    st.subheader("🎯 Result")
+    st.subheader("🎯 Prediction Analysis")
     
-    if st.button("Generate Forecast", use_container_width=True):
-        # Feature Engineering (11 columns)
+    if predict_btn:
+        # Engineering features (11 columns)
         avg_atv = est_volume / (trans_count + 1e-6)
         timeline = (year - 2018) * 4 + quarter
         
@@ -107,33 +112,32 @@ with col2:
             prediction = model.predict(input_data)
             final_val = np.expm1(prediction[0]) 
 
-            # Result Display
+            # Display Result Card
             st.metric(
-                label="Estimated Transaction Value", 
+                label="Predicted Transaction Value", 
                 value=f"₹{final_val:,.2f}",
-                delta=f"Based on Q{quarter} {year} Trends"
+                delta=f"Forecast for Q{quarter} {year}"
             )
             
-            # Feature Importance Chart (Clean White Theme)
+            # Professional Analysis Chart
             st.write("---")
             impact_data = pd.DataFrame({
-                'Feature': ['Volume', 'Time', 'Year', 'Quarter', 'Size'],
-                'Weight': [0.45, 0.25, 0.15, 0.10, 0.05]
-            }).sort_values('Weight')
+                'Driver': ['Volume', 'Timeline', 'Year', 'Quarter', 'Ticket Size'],
+                'Strength': [0.45, 0.25, 0.15, 0.10, 0.05]
+            }).sort_values('Strength')
             
-            fig = px.bar(impact_data, x='Weight', y='Feature', orientation='h',
-                         template='plotly_white', # White template
-                         color_discrete_sequence=['#5F259F']) # Purple color
+            fig = px.bar(impact_data, x='Strength', y='Driver', orientation='h',
+                         template='plotly_white', 
+                         color_discrete_sequence=['#5f259f'])
             
-            fig.update_layout(
-                title="Model Driver Intensity",
-                margin=dict(l=20, r=20, t=40, b=20),
-                height=300
-            )
+            fig.update_layout(title="Model Influence Factors", height=300)
             st.plotly_chart(fig, use_container_width=True)
 
         except Exception as e:
-            st.error(f"Error during prediction: {e}")
+            st.error(f"Prediction Error: {e}")
+    else:
+        # Placeholder when button is not clicked
+        st.info("Click the 'Generate Forecast' button to see the results.")
 
 st.divider()
-st.caption("AI/ML Internship Project | © 2026 Digital India Analytics")
+st.caption("Developed for Labmentix AI/ML Internship Portfolio")

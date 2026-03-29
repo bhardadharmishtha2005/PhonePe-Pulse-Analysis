@@ -11,7 +11,6 @@ st.set_page_config(page_title="PhonePe Pulse Analytics", page_icon="📈", layou
 # 2. Enhanced Styling for White Theme & Gradient Button
 st.markdown("""
     <style>
-    .stApp { background-color: #FFFFFF; }
     
     /* Global Text Color */
     h1, h2, h3, p, label, .stMarkdown { color: #2D3436 !important; }

@@ -186,4 +186,3 @@ streamlit run app.py
     """)
 
 st.divider()
-st.caption(f"Internship Portfolio | © {datetime.now().year} Digital India Analytics Case Study")

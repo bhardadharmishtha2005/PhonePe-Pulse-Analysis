@@ -51,7 +51,7 @@ st.markdown("""
 
 # 3. Sidebar Navigation
 with st.sidebar:
-    st.markdown("# **Pulse v2.0**")
+    st.markdown("## 📊 **Project Pulse**")
     menu = st.radio("MAIN MENU", ["🚀 Predictor Engine", "📊 Advanced Analytics", "📄 Tech Documentation"])
     
     st.divider()

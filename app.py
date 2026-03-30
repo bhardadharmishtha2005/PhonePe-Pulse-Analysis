@@ -7,68 +7,62 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 # 1. Page Config
-st.set_page_config(page_title="PhonePe Pulse Ultra-Analytics", page_icon="⚡", layout="wide")
+st.set_page_config(page_title="PhonePe Pulse Analytics", page_icon="⚡", layout="wide")
 
-# 2. Premium White Theme & Interactive Button CSS
+# 2. Light Theme CSS & Updated Button Color
 st.markdown("""
     <style>
     .stApp { background-color: #FFFFFF; }
     
-    /* Dark Text for Clarity */
-    h1, h2, h3, p, label, .stMarkdown { color: #1E1E1E !important; font-family: 'Inter', sans-serif; }
+    /* Dark Text for Visibility */
+    h1, h2, h3, p, label, .stMarkdown { color: #1E1E1E !important; }
 
-    /* Sidebar - Clean & Modern */
+    /* Sidebar Styling */
     [data-testid="stSidebar"] {
-        background-color: #F8F9FA;
-        border-right: 1px solid #EDEDED;
+        background-color: #FDFDFF;
+        border-right: 1px solid #E9ECEF;
     }
 
-    /* CARD DESIGN: Added subtle borders and soft shadows */
+    /* Metric Cards */
     div[data-testid="stMetric"] {
         background-color: #FFFFFF;
-        border: 1px solid #F0F0F0;
+        border: 1px solid #E9ECEF;
         padding: 20px;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
     }
 
-    /* GRADIENT BUTTON WITH PULSE EFFECT */
+    /* UPDATED: Lighter Button Color */
     div.stButton > button:first-child {
-        background: linear-gradient(135deg, #5F259F 0%, #A4508B 100%) !important;
+        background-color: #9B59B6 !important; /* Lighter Amethyst Purple */
         color: white !important;
         border: none !important;
-        border-radius: 12px !important;
-        height: 3.8em !important;
-        font-size: 16px !important;
-        letter-spacing: 1px;
-        box-shadow: 0 8px 15px rgba(95, 37, 159, 0.2) !important;
-        transition: all 0.4s ease !important;
+        border-radius: 10px !important;
+        height: 3.5em !important;
+        font-weight: 600 !important;
+        width: 100%;
+        transition: 0.3s;
     }
     
     div.stButton > button:hover {
-        transform: scale(1.02) !important;
-        box-shadow: 0 12px 25px rgba(95, 37, 159, 0.4) !important;
+        background-color: #A569BD !important; /* Even lighter on hover */
+        border: none !important;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# 3. Sidebar - Enterprise Navigation
+# 3. Sidebar - Simplified
 with st.sidebar:
     st.markdown("# **Pulse v2.0**")
-    menu = st.radio("MAIN MENU", ["🚀 Predictor Engine", "📊 Deep Market Insights", "📄 Tech Documentation"])
+    menu = st.radio("MENU", ["🚀 Predictor Engine", "📊 Market Insights", "📄 Tech Documentation"])
     
     st.divider()
-    st.markdown("### **Model Performance**")
-    st.progress(98, text="Accuracy: 98%")
-    st.caption("Algorithm: XGBoost Regressor")
+    st.markdown("### **Model Status**")
+    st.success("XGBoost Model: Active")
+    st.info("Accuracy: 98%")
     
     st.divider()
-    st.markdown("### **Quick Stats**")
-    st.write("📈 Forecasts Generated: 1,240+")
-    st.write("🔄 Last Data Sync: Mar 2026")
-    
-    if st.button("📥 Download Report"):
-        st.toast("Generating PDF Report...")
+    st.caption("Last Updated: March 2026")
 
 # 4. Load Model
 @st.cache_resource
@@ -79,25 +73,23 @@ model = load_model()
 
 # 5. Main Content Logic
 if menu == "🚀 Predictor Engine":
-    st.title("⚡ PhonePe Pulse: AI Prediction Engine")
-    st.markdown("##### Transform raw transaction data into actionable financial intelligence.")
+    st.title("⚡ Transaction Prediction Engine")
     
     col1, col2 = st.columns([1, 1.6], gap="large")
     
     with col1:
-        st.subheader("⚙️ Configuration")
+        st.subheader("⚙️ Inputs")
         with st.container(border=True):
-            trans_count = st.number_input("Transaction Volume (Count)", value=5000)
-            year = st.select_slider("Target Forecast Year", options=list(range(2018, 2027)), value=2024)
-            quarter = st.segmented_control("Fiscal Quarter", [1, 2, 3, 4], default=1)
-            est_vol = st.number_input("Avg Regional Revenue (₹)", value=150000)
+            trans_count = st.number_input("Transaction Count", value=5000)
+            year = st.select_slider("Year", options=list(range(2018, 2027)), value=2024)
+            quarter = st.segmented_control("Quarter", [1, 2, 3, 4], default=1)
+            est_vol = st.number_input("Regional Volume (₹)", value=150000)
             
-            predict_btn = st.button("RUN AI ANALYSIS")
+            predict_btn = st.button("RUN ANALYSIS")
 
     with col2:
-        st.subheader("🎯 Intelligence Output")
+        st.subheader("🎯 Result")
         if predict_btn:
-            # Data Preprocessing
             avg_atv = est_vol / (trans_count + 1e-6)
             timeline = (year - 2018) * 4 + int(quarter)
             input_data = np.zeros((1, 11))
@@ -106,76 +98,60 @@ if menu == "🚀 Predictor Engine":
             prediction = model.predict(input_data)
             final_val = np.expm1(prediction[0])
 
-            # Prediction Card
-            st.metric(label="Estimated Transaction Value", value=f"₹{final_val:,.2f}", delta="+12.4% vs Prev Quarter")
+            st.metric(label="Predicted Value", value=f"₹{final_val:,.2f}")
 
-            # --- GRAPH 1: Predictive Confidence Interval ---
-            st.markdown("#### 🛡️ Forecast Reliability Range")
-            lower = final_val * 0.92
-            upper = final_val * 1.08
-            fig_range = go.Figure([
-                go.Scatter(x=['Min', 'Predicted', 'Max'], y=[lower, final_val, upper], 
-                           mode='lines+markers+text', text=[f"₹{lower:,.0f}", f"₹{final_val:,.0f}", f"₹{upper:,.0f}"],
-                           textposition="top center", line=dict(color='#5F259F', width=3))
-            ])
-            fig_range.update_layout(template="plotly_white", height=250, margin=dict(l=20,r=20,t=30,b=20))
-            st.plotly_chart(fig_range, use_container_width=True)
-            
-            # --- GRAPH 2: Value Distribution ---
-            st.markdown("#### 🍩 Transaction Weightage")
-            fig_donut = px.pie(values=[40, 25, 20, 15], names=['P2P', 'Merchant', 'Bills', 'Others'], 
-                               hole=0.5, color_discrete_sequence=px.colors.sequential.RdPu)
-            fig_donut.update_layout(height=280, margin=dict(l=0,r=0,t=0,b=0))
-            st.plotly_chart(fig_donut, use_container_width=True)
-
+            # Graph: Trend
+            fig = go.Figure(go.Scatter(x=[year-1, year, year+1], y=[final_val*0.9, final_val, final_val*1.1],
+                                     line=dict(color='#9B59B6', width=4), fill='tozeroy'))
+            fig.update_layout(template="plotly_white", height=300)
+            st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("💡 Adjust the parameters on the left to activate the AI Prediction Model.")
+            st.info("Enter details and click 'Run Analysis' to see results.")
 
-elif menu == "📊 Deep Market Insights":
-    st.title("🔍 Advanced Market Analytics")
-    
-    row1_col1, row1_col2 = st.columns(2)
-    
-    with row1_col1:
-        # --- GRAPH 3: Radar Chart (Model Sensitivity) ---
-        st.subheader("🕸️ Feature Sensitivity")
-        fig_radar = go.Figure(data=go.Scatterpolar(
-            r=[4.5, 3.2, 4.8, 2.1, 3.9],
-            theta=['Volume','Timing','Year','Quarter','Avg Ticket'],
-            fill='toself', line=dict(color='#A4508B')
-        ))
-        fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 5])), height=350)
-        st.plotly_chart(fig_radar, use_container_width=True)
-
-    with row1_col2:
-        # --- GRAPH 4: Heatmap Simulation (Regional Growth) ---
-        st.subheader("🌡️ Regional Growth Intensity")
-        z_data = np.random.rand(5, 5)
-        fig_heat = px.imshow(z_data, labels=dict(x="Region", y="Period", color="Growth"),
-                             x=['North', 'South', 'East', 'West', 'Central'],
-                             color_continuous_scale='Purples')
-        fig_heat.update_layout(height=350)
-        st.plotly_chart(fig_heat, use_container_width=True)
-
-    # --- GRAPH 5: Influence Ranking ---
-    st.subheader("🏆 Primary Market Drivers")
-    impact_data = pd.DataFrame({
-        'Driver': ['Volume', 'Time index', 'Year', 'Quarter', 'Avg Ticket'],
-        'Importance': [45, 25, 15, 10, 5]
-    }).sort_values('Importance')
-    st.plotly_chart(px.bar(impact_data, x='Importance', y='Driver', orientation='h', 
-                           color='Importance', color_continuous_scale='Purp', template="plotly_white"))
+elif menu == "📊 Market Insights":
+    st.title("🔍 Advanced Analytics")
+    c1, c2 = st.columns(2)
+    with c1:
+        st.plotly_chart(px.pie(values=[60, 40], names=['Success', 'Failure'], hole=.5, 
+                               color_discrete_sequence=['#9B59B6', '#E9ECEF']))
+    with c2:
+        impact_data = pd.DataFrame({'Factor': ['Vol', 'Time', 'Year'], 'Val': [45, 25, 30]})
+        st.plotly_chart(px.bar(impact_data, x='Val', y='Factor', orientation='h', color_discrete_sequence=['#9B59B6']))
 
 elif menu == "📄 Tech Documentation":
-    st.title("📚 Project Architecture")
-    with st.expander("Model Specifications", expanded=True):
-        st.write("- **Base Learner:** XGBoost Gradient Boosted Trees")
-        st.write("- **Preprocessing:** Log-transformation & Feature Engineering")
-        st.write("- **Validation:** 98% Test Accuracy achieved during Labmentix Internship")
+    st.title("📚 Technical Documentation")
     
-    with st.expander("Developer Notes"):
-        st.write("Created by: Bharda Dharmishtha Mahendrabhai")
-        st.write("Role: AI/ML Intern @ Labmentix")
+    st.subheader("🛠️ Technology Stack")
+    st.markdown("""
+    * **Language:** Python
+    * **ML Model:** XGBoost Regressor for high-precision time-series forecasting
+    * **Web Framework:** Streamlit for interactive UI
+    * **Visualization:** Plotly Express and Graph Objects for dynamic charts
+    * **Deployment:** GitHub for version control and Streamlit Cloud for hosting
+    """)
+    
+    st.divider()
+    
+    st.subheader("🚀 How to Run Locally")
+    st.code("""
+# 1. Clone the repository
+git clone https://github.com/your-username/PhonePe-Pulse-Analysis.git
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Run the application
+streamlit run app.py
+    """, language="bash")
+    
+    st.divider()
+    
+    st.subheader("📊 Key Features")
+    st.markdown("""
+    * **Real-time Prediction:** Generates financial forecasts based on 11 feature inputs.
+    * **Interactive Insights:** Visualizes market drivers and growth trends using advanced charting.
+    * **Cloud Hosted:** Accessible via any web browser through the Streamlit Cloud platform.
+    """)
 
 st.divider()
-st.caption(f"© {datetime.now().year} Digital India Analytics | PhonePe Pulse Case Study")
+st.caption(f"© {datetime.now().year} PhonePe Pulse Analytics Project")

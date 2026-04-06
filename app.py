@@ -70,7 +70,7 @@ model = load_model()
 
 # 5. Dashboard Logic
 if menu == "🚀 Predictor Engine":
-    st.title("⚡ Transaction Prediction Engine")
+    st.title("⚡ PhonePe Pulse Analytics")
     
     col1, col2 = st.columns([1, 1.6], gap="large")
     

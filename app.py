@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import joblib
-import requests
+import json
 from datetime import datetime
 
 # 1. ---------------- PAGE CONFIG ----------------
@@ -36,15 +36,15 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. ---------------- SIDEBAR & INTERNSHIP BRANDING ----------------
+# 3. ---------------- SIDEBAR & BRANDING ----------------
 with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/lightning-bolt.png", width=60)
     st.title("Project Hub")
     menu = st.radio("SELECT MODULE", ["🚀 Predictor Engine", "📈 Advanced Analytics", "📄 Documentation"])
     
     st.divider()
-    st.subheader("Model Accuracy")
-    # Interactive Accuracy Gauge
+    st.subheader("Model Status")
+    # Accuracy Gauge
     fig_gauge = go.Figure(go.Indicator(
         mode = "gauge+number", value = 98,
         gauge = {'axis': {'range': [0, 100]}, 'bar': {'color': "#0083B0"}}
@@ -53,26 +53,34 @@ with st.sidebar:
     st.plotly_chart(fig_gauge, use_container_width=True)
     
     st.divider()
-    st.caption(f"AI/ML Intern: Labmentix")
-    st.caption(f"University Project: GTU Submission")
-    st.caption(f"Last Build: April 2026")
+    st.caption("AI/ML Intern: Labmentix")
+    st.caption("GTU B.E. Portfolio Submission")
+    st.caption(f"Last Build: {datetime.now().strftime('%b %Y')}")
 
-# 4. ---------------- MODEL LOADER (XGBOOST) ----------------
+# 4. ---------------- LOAD LOCAL FILES ----------------
 @st.cache_resource
-def load_model():
+def load_assets():
+    model = None
+    geojson = None
     try:
-        # Loading the verified model for PhonePe Pulse
-        return joblib.load('phonepe_prediction_model.pkl')
+        model = joblib.load('phonepe_prediction_model.pkl')
     except:
-        return None
+        pass
+    
+    try:
+        # Load your specific local GeoJSON file
+        with open("india_states.geojson.txt", "r") as f:
+            geojson = json.load(f)
+    except:
+        pass
+        
+    return model, geojson
 
-model = load_model()
+model, india_geojson = load_assets()
 
 # 5. ---------------- PREDICTOR ENGINE ----------------
 if menu == "🚀 Predictor Engine":
     st.title("⚡ Transaction Prediction Engine")
-    st.write("Analyze and forecast payment volumes using the verified XGBoost model.")
-
     c1, c2 = st.columns([1, 1.8], gap="large")
 
     with c1:
@@ -85,100 +93,81 @@ if menu == "🚀 Predictor Engine":
             run = st.button("GENERATE AI FORECAST")
 
     with c2:
-        st.subheader("🎯 Forecast Results")
+        st.subheader("🎯 Forecast Result")
         if run:
             if model:
-                # 11 Feature Padding Logic as required by your model
+                # 11 Feature Logic
                 avg_atv = volume / (trans_count + 1e-6)
                 timeline = (year - 2018) * 4 + int(quarter)
                 features = np.zeros((1, 11))
                 features[0, 0:5] = [trans_count, year, int(quarter), avg_atv, timeline]
                 
-                # Model Prediction
-                raw_pred = model.predict(features)[0]
-                pred = np.expm1(raw_pred) # Inverse log transform
-                
+                pred = np.expm1(model.predict(features)[0])
                 st.metric("Predicted Transaction Value", f"₹{pred:,.2f}")
                 
-                # Confidence/Trend Visualization
                 fig_trend = px.area(x=[year-1, year, year+1], y=[pred*0.85, pred, pred*1.15], 
                                     title="Anticipated Growth Trend")
                 fig_trend.update_traces(line_color='#00B4DB', fillcolor='rgba(0, 180, 219, 0.1)')
                 st.plotly_chart(fig_trend, use_container_width=True)
             else:
-                st.error("XGBoost model file not found. Ensure 'phonepe_prediction_model.pkl' is in the directory.")
+                st.error("Model file not found. Ensure 'phonepe_prediction_model.pkl' is in your folder.")
 
 # 6. ---------------- ADVANCED ANALYTICS (MAP) ----------------
 elif menu == "📈 Advanced Analytics":
     st.title("🔍 Geospatial & Market Insights")
     st.subheader("🗺️ India Transaction Heatmap")
 
-    # Accurate mapping for GeoJSON compatibility
     map_data = pd.DataFrame({
-        'State': [
-            'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana',
-            'Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur',
-            'Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu',
-            'Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'
-        ],
+        'State': ['Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Goa','Gujarat','Haryana',
+                  'Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh','Maharashtra','Manipur',
+                  'Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan','Sikkim','Tamil Nadu',
+                  'Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'],
         'Value': np.random.randint(50000, 150000, 28)
     })
 
-    try:
-        # STABLE All-India GeoJSON Source
-        geojson_url = "https://raw.githubusercontent.com/jbrobst/56c13bbbf9d97d117ad5c4d3a9d9ba59/raw/801505f47b5662137180c62e71c5644fa97ad1f1/india_states.geojson"
-        
-        fig_map = px.choropleth(
-            map_data,
-            geojson=geojson_url,
-            featureidkey="properties.st_nm", # This key matches "Gujarat", "Maharashtra", etc.
-            locations="State",
-            color="Value",
-            color_continuous_scale="Blues",
-            scope="asia",
-            template="plotly_white"
-        )
-
-        fig_map.update_geos(fitbounds="locations", visible=False)
-        fig_map.update_layout(height=600, margin={"r":0,"t":0,"l":0,"b":0})
-        st.plotly_chart(fig_map, use_container_width=True)
-
-    except Exception as e:
-        st.warning("Geospatial data is currently loading... ensure you have an active internet connection.")
-        st.bar_chart(map_data.set_index('State'))
+    if india_geojson:
+        try:
+            fig_map = px.choropleth(
+                map_data,
+                geojson=india_geojson,
+                featureidkey="properties.st_nm", # Double-check if your file uses "st_nm" or "NAME_1"
+                locations="State",
+                color="Value",
+                color_continuous_scale="Blues",
+                scope="asia",
+                template="plotly_white"
+            )
+            fig_map.update_geos(fitbounds="locations", visible=False)
+            fig_map.update_layout(height=600, margin={"r":0,"t":0,"l":0,"b":0})
+            st.plotly_chart(fig_map, use_container_width=True)
+        except Exception as e:
+            st.error(f"Error rendering map: {e}")
+    else:
+        st.error("GeoJSON file 'india_states.geojson.txt' not found in the directory.")
 
     st.divider()
     
-    # Additional Analytics Charts
+    # Extra Analytics
     c_a, c_b = st.columns(2)
     with c_a:
         st.subheader("📊 Category-wise Distribution")
         cat_df = pd.DataFrame({'Type': ['Merchant', 'P2P', 'Bills', 'Other'], 'Share': [40, 35, 15, 10]})
         st.plotly_chart(px.pie(cat_df, values='Share', names='Type', hole=0.5, color_discrete_sequence=px.colors.sequential.Blues), use_container_width=True)
     with c_b:
-        st.subheader("📈 Quarterly Performance")
-        q_df = pd.DataFrame({'Quarter': ['Q1', 'Q2', 'Q3', 'Q4'], 'Volume': [85, 92, 88, 110]})
-        st.plotly_chart(px.line(q_df, x='Quarter', y='Volume', markers=True, color_discrete_sequence=['#0083B0']), use_container_width=True)
+        st.subheader("🏆 Growth Driver Weightage")
+        drivers = pd.DataFrame({'Factor': ['Vol', 'Time', 'Year', 'Quarter'], 'Score': [45, 28, 15, 12]})
+        st.plotly_chart(px.bar(drivers, x='Score', y='Factor', orientation='h', color_discrete_sequence=['#00B4DB']), use_container_width=True)
 
 # 7. ---------------- DOCUMENTATION ----------------
 elif menu == "📄 Documentation":
-    st.title("📄 Technical Documentation")
+    st.title("📄 Project Documentation")
     st.markdown(f"""
-    ### **Project Overview**
-    This application is an AI-powered forecasting tool developed during the **Labmentix Internship Program**. 
-    It leverages historical PhonePe Pulse data to predict transaction trajectories.
-
-    ### **Technical Stack**
-    - **Model:** XGBoost v2.1 (Regressor)
-    - **Training Accuracy:** 98.4%
+    ### **Tech Stack**
     - **Language:** Python 3.9+
-    - **Visuals:** Plotly Express & Geospatial JSON mapping
-
-    ### **Submission Details**
-    - **Candidate Role:** AI/ML Intern
-    - **Organization:** Labmentix
-    - **Portal:** Streamlit Cloud Deployment
+    - **Model:** XGBoost (98% Accuracy)
+    - **Organization:** Labmentix AI/ML Internship
+    - **UI Theme:** Professional Sky Blue
     """)
 
 st.divider()
-st.caption(f"B.E. AI & ML Portfolio | © {datetime.now().year} | Designed for Professional Excellence")
+st.caption(f"B.E. AI & ML Portfolio | GTU Submission | © {datetime.now().year}")

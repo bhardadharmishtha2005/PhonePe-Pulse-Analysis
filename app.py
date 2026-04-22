@@ -1,26 +1,42 @@
-# 5. Modules
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+import requests
+
+# Page config
+st.set_page_config(page_title="PhonePe Pulse ML", layout="wide")
+
+# ✅ SIDEBAR FIRST
+with st.sidebar:
+    st.title("Project Hub")
+
+    menu = st.radio(
+        "GO TO:",
+        ["🚀 Predictor Engine", "📈 Advanced Analytics", "📄 Documentation"]
+    )
+
+# ✅ NOW USE menu
 if menu == "🚀 Predictor Engine":
     st.title("⚡ Transaction Prediction Engine")
-    # your predictor code here
-
+    st.write("Your predictor UI here")
 
 elif menu == "📈 Advanced Analytics":
     st.title("🔍 Geospatial & Market Insights")
-    
-    import requests
 
     st.subheader("🗺️ India Transaction Heatmap")
 
     map_data = pd.DataFrame({
         'State': [
-            'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar',
-            'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana',
-            'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
-            'Madhya Pradesh', 'Maharashtra', 'Manipur',
-            'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha',
-            'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
-            'Telangana', 'Tripura', 'Uttar Pradesh',
-            'Uttarakhand', 'West Bengal'
+            'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar',
+            'Chhattisgarh','Goa','Gujarat','Haryana',
+            'Himachal Pradesh','Jharkhand','Karnataka','Kerala',
+            'Madhya Pradesh','Maharashtra','Manipur',
+            'Meghalaya','Mizoram','Nagaland','Odisha',
+            'Punjab','Rajasthan','Sikkim','Tamil Nadu',
+            'Telangana','Tripura','Uttar Pradesh',
+            'Uttarakhand','West Bengal'
         ],
         'Value': np.random.randint(50000, 150000, 28)
     })
@@ -44,6 +60,6 @@ elif menu == "📈 Advanced Analytics":
     except Exception as e:
         st.error(f"Map failed: {e}")
 
-
 elif menu == "📄 Documentation":
-    st.title("📄 Project Documentation")
+    st.title("📄 Documentation")
+    st.write("Project details here")

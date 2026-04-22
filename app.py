@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 
 # 1. Page Config
-st.set_page_config(page_title="PhonePe Pulse ML | GTU Portfolio", page_icon="🎓", layout="wide")
+st.set_page_config(page_title="PhonePe Pulse ML", page_icon="🎓", layout="wide")
 
 # 2. Refined Professional Styling
 st.markdown("""
@@ -169,4 +169,4 @@ elif menu == "📄 Tech Documentation":
     st.write("This application is deployed on **Streamlit Cloud** with automated CI/CD via GitHub.")
 
 st.divider()
-st.caption(f"B.E. AI & ML Portfolio | GTU Submission Grade | © {datetime.now().year}")
+

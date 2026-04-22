@@ -1,65 +1,29 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.express as px
-import plotly.graph_objects as go
-import requests
-
-# Page config
-st.set_page_config(page_title="PhonePe Pulse ML", layout="wide")
-
-# ✅ SIDEBAR FIRST
-with st.sidebar:
-    st.title("Project Hub")
-
-    menu = st.radio(
-        "GO TO:",
-        ["🚀 Predictor Engine", "📈 Advanced Analytics", "📄 Documentation"]
-    )
-
-# ✅ NOW USE menu
 if menu == "🚀 Predictor Engine":
     st.title("⚡ Transaction Prediction Engine")
-    st.write("Your predictor UI here")
 
-elif menu == "📈 Advanced Analytics":
-    st.title("🔍 Geospatial & Market Insights")
+    c1, c2 = st.columns([1, 1.5], gap="large")
 
-    st.subheader("🗺️ India Transaction Heatmap")
+    with c1:
+        st.subheader("Input Parameters")
 
-    map_data = pd.DataFrame({
-        'State': [
-            'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar',
-            'Chhattisgarh','Goa','Gujarat','Haryana',
-            'Himachal Pradesh','Jharkhand','Karnataka','Kerala',
-            'Madhya Pradesh','Maharashtra','Manipur',
-            'Meghalaya','Mizoram','Nagaland','Odisha',
-            'Punjab','Rajasthan','Sikkim','Tamil Nadu',
-            'Telangana','Tripura','Uttar Pradesh',
-            'Uttarakhand','West Bengal'
-        ],
-        'Value': np.random.randint(50000, 150000, 28)
-    })
+        trans_count = st.number_input("Transaction Count", value=5000)
+        year = st.select_slider("Select Year", options=list(range(2018, 2027)), value=2024)
+        quarter = st.radio("Select Quarter", [1, 2, 3, 4], horizontal=True)
+        volume = st.number_input("Regional Volume (₹)", value=150000)
 
-    try:
-        geojson_url = "https://raw.githubusercontent.com/geohacker/india/master/state/india_telengana.geojson"
-        india_geojson = requests.get(geojson_url).json()
+        run = st.button("GENERATE AI FORECAST")
 
-        fig_map = px.choropleth(
-            map_data,
-            geojson=india_geojson,
-            featureidkey="properties.NAME_1",
-            locations="State",
-            color="Value",
-            color_continuous_scale="Blues"
-        )
+    with c2:
+        st.subheader("Intelligence Result")
 
-        fig_map.update_geos(fitbounds="locations", visible=False)
-        st.plotly_chart(fig_map, use_container_width=True)
+        if run:
+            pred = (volume / (trans_count + 1)) * 10  # dummy logic
 
-    except Exception as e:
-        st.error(f"Map failed: {e}")
+            st.metric("Predicted Transaction Value", f"₹{pred:,.2f}")
 
-elif menu == "📄 Documentation":
-    st.title("📄 Documentation")
-    st.write("Project details here")
+            fig = px.area(
+                x=[year-1, year, year+1],
+                y=[pred*0.8, pred, pred*1.2],
+                title="Forecast Trend"
+            )
+            st.plotly_chart(fig, use_container_width=True)

@@ -6,7 +6,7 @@ import plotly.graph_objects as go
 import joblib
 from datetime import datetime
 
-# 1. ---------------- PAGE CONFIG ----------------
+# 1. ---------------- PAGE CONFIG & STYLING ----------------
 st.set_page_config(page_title="PhonePe Pulse Analytics", page_icon="📈", layout="wide")
 
 st.markdown("""
@@ -15,11 +15,13 @@ st.markdown("""
     [data-testid="stSidebar"] { background-color: #F0F7FF; border-right: 1px solid #D1E3F8; min-width: 300px; }
     h1, h2, h3 { color: #0083B0 !important; font-family: 'Inter', sans-serif; font-weight: 700; }
     
+    /* Metric Card Styling */
     div[data-testid="stMetric"] {
         background: #FFFFFF; border-radius: 12px; padding: 20px;
         border: 1px solid #D1E3F8; box-shadow: 0 4px 10px rgba(0, 104, 201, 0.05);
     }
 
+    /* Professional Button Styling */
     div.stButton > button:first-child {
         background: linear-gradient(135deg, #00B4DB 0%, #0083B0 100%) !important;
         color: white !important; border-radius: 10px !important; font-weight: 600 !important;
@@ -28,9 +30,10 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 2. ---------------- DATA LOAD (Keep this outside the menu logic) ----------------
+# 2. ---------------- DATA LOADING ----------------
 @st.cache_resource
 def load_data():
+    # Full list of States for Heatmap
     states = [
         "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", 
         "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", 
@@ -59,6 +62,7 @@ with st.sidebar:
     st.subheader("Model Status")
     st.success("XGBoost v2.1: Operational")
     
+    # Confidence Gauge
     fig_gauge = go.Figure(go.Indicator(
         mode = "gauge+number", value = 98,
         gauge = {'axis': {'range': [0, 100]}, 'bar': {'color': "#0083B0"}}
@@ -70,7 +74,8 @@ with st.sidebar:
     st.caption("**AI/ML Intern:** Labmentix")
     st.caption(f"**Last Updated:** {datetime.now().strftime('%b %Y')}")
 
-# 4. ---------------- MENU LOGIC (This must be a continuous block) ----------------
+# 4. ---------------- MENU LOGIC ----------------
+
 if menu == "🚀 Predictor Engine":
     st.title("⚡ Transaction Prediction Engine")
     st.markdown("---")
@@ -81,6 +86,7 @@ if menu == "🚀 Predictor Engine":
         st.subheader("⚙️ Parameters")
         with st.container(border=True):
             trans_count = st.number_input("Total Transaction Count", value=5000)
+            # FIXED: Expanded year range from 2018 to 2026
             year = st.select_slider("Select Fiscal Year", options=list(range(2018, 2027)), value=2024)
             quarter = st.radio("Select Quarter", [1, 2, 3, 4], horizontal=True)
             volume = st.number_input("Regional Volume (₹)", value=150000)
@@ -90,6 +96,7 @@ if menu == "🚀 Predictor Engine":
         st.subheader("🎯 Intelligence Output")
         if run:
             if model:
+                # 11 Feature Alignment
                 avg_atv = volume / (trans_count + 1e-6)
                 timeline = (year - 2018) * 4 + int(quarter)
                 features = np.zeros((1, 11))
@@ -98,9 +105,11 @@ if menu == "🚀 Predictor Engine":
                 pred = np.expm1(model.predict(features)[0])
                 st.metric("Predicted Transaction Value", f"₹{pred:,.2f}")
                 
+                # Enhanced Area Chart
                 fig_trend = px.area(x=[year-1, year, year+1], y=[pred*0.85, pred, pred*1.15], 
                                     title="Forecasted Growth Trend")
                 fig_trend.update_traces(line_color='#00B4DB', fillcolor='rgba(0, 180, 219, 0.1)')
+                fig_trend.update_layout(xaxis_title="Year", yaxis_title="Volume (₹)")
                 st.plotly_chart(fig_trend, use_container_width=True)
             else:
                 st.error("XGBoost model file not found in directory.")
@@ -127,27 +136,39 @@ elif menu == "📈 Advanced Analytics":
 
     st.divider()
     
+    # IMPROVED 4-CHART DESIGN
     st.subheader("📊 Market Analysis Metrics")
     m1, m2 = st.columns(2)
     m3, m4 = st.columns(2)
     
     with m1:
+        # Donut Chart with Premium Colors
         st.plotly_chart(px.pie(names=['P2P', 'Merchant', 'Bills', 'Misc'], values=[40, 35, 20, 5], 
-                               hole=0.4, title="Category Mix"), use_container_width=True)
+                               hole=0.5, title="Transaction Category Mix",
+                               color_discrete_sequence=px.colors.sequential.Blues_r), use_container_width=True)
     with m2:
-        st.plotly_chart(px.bar(x=['Q1', 'Q2', 'Q3', 'Q4'], y=[15, 22, 18, 30], title="Quarterly Growth %"), use_container_width=True)
+        # Gradient Bar Chart
+        st.plotly_chart(px.bar(x=['Q1', 'Q2', 'Q3', 'Q4'], y=[15, 22, 18, 30], 
+                               title="Quarterly Growth %", 
+                               color_discrete_sequence=['#0083B0']), use_container_width=True)
     with m3:
+        # Top States Horizontal Bar
         top_5 = india_data.nlargest(5, 'Transactions')
-        st.plotly_chart(px.bar(top_5, x='Transactions', y='State', orientation='h', title="Top 5 States"), use_container_width=True)
+        st.plotly_chart(px.bar(top_5, x='Transactions', y='State', orientation='h', 
+                               title="Top 5 Performing Regions",
+                               color='Transactions', color_continuous_scale='Blues'), use_container_width=True)
     with m4:
-        st.plotly_chart(px.line(x=['2021', '2022', '2023', '2024'], y=[100, 145, 190, 260], title="Adoption Trend", markers=True), use_container_width=True)
+        # Adoption Line Chart with Markers
+        st.plotly_chart(px.line(x=['2021', '2022', '2023', '2024'], y=[100, 145, 190, 260], 
+                                title="Yearly Adoption Trend", markers=True,
+                                color_discrete_sequence=['#00B4DB']), use_container_width=True)
 
 elif menu == "📄 Tech Documentation":
     st.title("📚 Project Documentation")
     st.markdown("---")
     
-    # FIXED: Correct variable unpacking for the number of tabs created
-    t1, t2 = st.tabs(["🚀 Setup Guide", "🛠️ Architecture"])
+    # FIXED: Correct variable unpacking for 3 tabs
+    t1, t2, t3 = st.tabs(["🚀 Setup Guide", "🛠️ System Architecture", "🎓 Internship Context"])
     
     with t1:
         st.subheader("Installation & Deployment")
@@ -161,5 +182,14 @@ elif menu == "📄 Tech Documentation":
         - **Accuracy:** 98% Predictive Confidence
         - **UI Theme:** Sky Blue Professional Edition
         """)
+        
+    with t3:
+        st.markdown(f"""
+        ### Candidate Details
+        - **Organization:** Labmentix
+        - **Role:** AI/ML Intern
+        - **Project:** Financial Transaction Forecasting
+        """)
 
 st.divider()
+st.caption(f"© {datetime.now().year} | PhonePe Pulse Prediction Dashboard | Labmentix Submission")

@@ -9,8 +9,6 @@ from datetime import datetime
 # 1. ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="PhonePe Pulse Analytics", page_icon="📈", layout="wide")
 
-st.set_page_config(page_title="PhonePe Pulse Analytics", page_icon="💎", layout="wide")
-
 st.markdown("""
     <style>
     .stApp { background-color: #FFFFFF; }
@@ -35,6 +33,42 @@ st.markdown("""
     }
     </style>
     """, unsafe_allow_html=True)
+
+if menu == "🚀 Predictor Engine":
+    st.title("⚡ Transaction Prediction Engine")
+    st.markdown("---")
+    
+    c1, c2 = st.columns([1, 1.8], gap="large")
+
+    with c1:
+        st.subheader("⚙️ Parameters")
+        with st.container(border=True):
+            trans_count = st.number_input("Total Transaction Count", value=5000)
+            year = st.select_slider("Select Fiscal Year", options=list(range(2018, 2027)), value=2024)
+            quarter = st.radio("Select Quarter", [1, 2, 3, 4], horizontal=True)
+            volume = st.number_input("Regional Volume (₹)", value=150000)
+            run = st.button("GENERATE AI FORECAST")
+
+    with c2:
+        st.subheader("🎯 Intelligence Output")
+        if run:
+            if model:
+                # 11 Feature Alignment
+                avg_atv = volume / (trans_count + 1e-6)
+                timeline = (year - 2018) * 4 + int(quarter)
+                features = np.zeros((1, 11))
+                features[0, 0:5] = [trans_count, year, int(quarter), avg_atv, timeline]
+                
+                pred = np.expm1(model.predict(features)[0])
+                st.metric("Predicted Transaction Value", f"₹{pred:,.2f}")
+                
+                fig_trend = px.area(x=[year-1, year, year+1], y=[pred*0.85, pred, pred*1.15], 
+                                    title="Forecasted Growth Trend")
+                fig_trend.update_traces(line_color='#00B4DB', fillcolor='rgba(0, 180, 219, 0.1)')
+                st.plotly_chart(fig_trend, use_container_width=True)
+            else:
+                st.error("XGBoost model file not found in directory.")
+                
 # 2. ---------------- DATA LOAD ----------------
 @st.cache_resource
 def load_data():
@@ -81,7 +115,7 @@ with st.sidebar:
     st.caption(f"**Last Updated:** {datetime.now().strftime('%b %Y')}")
 
 # 4. ---------------- MODULES ----------------
-if menu == "📈 Advanced Analytics":
+elif menu == "📈 Advanced Analytics":
     st.title("🔍 Geospatial & Market Insights")
     
     # --- SECTION 1: THE INDIA MAP (FIXED) ---
@@ -132,41 +166,6 @@ if menu == "📈 Advanced Analytics":
     with c4:
         st.plotly_chart(px.line(x=['2021', '2022', '2023', '2024'], y=[100, 145, 190, 260], 
                                 title="Adoption Trend", markers=True), use_container_width=True)
-
-if menu == "🚀 Predictor Engine":
-    st.title("⚡ Transaction Prediction Engine")
-    st.markdown("---")
-    
-    c1, c2 = st.columns([1, 1.8], gap="large")
-
-    with c1:
-        st.subheader("⚙️ Parameters")
-        with st.container(border=True):
-            trans_count = st.number_input("Total Transaction Count", value=5000)
-            year = st.select_slider("Select Fiscal Year", options=list(range(2018, 2027)), value=2024)
-            quarter = st.radio("Select Quarter", [1, 2, 3, 4], horizontal=True)
-            volume = st.number_input("Regional Volume (₹)", value=150000)
-            run = st.button("GENERATE AI FORECAST")
-
-    with c2:
-        st.subheader("🎯 Intelligence Output")
-        if run:
-            if model:
-                # 11 Feature Alignment
-                avg_atv = volume / (trans_count + 1e-6)
-                timeline = (year - 2018) * 4 + int(quarter)
-                features = np.zeros((1, 11))
-                features[0, 0:5] = [trans_count, year, int(quarter), avg_atv, timeline]
-                
-                pred = np.expm1(model.predict(features)[0])
-                st.metric("Predicted Transaction Value", f"₹{pred:,.2f}")
-                
-                fig_trend = px.area(x=[year-1, year, year+1], y=[pred*0.85, pred, pred*1.15], 
-                                    title="Forecasted Growth Trend")
-                fig_trend.update_traces(line_color='#00B4DB', fillcolor='rgba(0, 180, 219, 0.1)')
-                st.plotly_chart(fig_trend, use_container_width=True)
-            else:
-                st.error("XGBoost model file not found in directory.")
 
 elif menu == "📄 Tech Documentation":
     st.title("📚 Project Documentation")

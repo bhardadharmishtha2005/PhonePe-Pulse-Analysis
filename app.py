@@ -71,7 +71,6 @@ with st.sidebar:
     st.plotly_chart(fig_gauge, use_container_width=True)
     
     st.divider()
-    st.caption("**AI/ML Intern:** Labmentix")
     st.caption(f"**Last Updated:** {datetime.now().strftime('%b %Y')}")
 
 # 4. ---------------- MENU LOGIC ----------------
@@ -168,11 +167,17 @@ elif menu == "📄 Tech Documentation":
     st.markdown("---")
     
     # FIXED: Correct variable unpacking for 3 tabs
-    t1, t2, t3 = st.tabs(["🚀 Setup Guide", "🛠️ System Architecture", "🎓 Internship Context"])
+    t1, t2, t3 = st.tabs(["🚀 Setup Guide", "🛠️ System Architecture"])
     
     with t1:
         st.subheader("Installation & Deployment")
-        st.code("pip install streamlit pandas numpy plotly joblib scikit-learn xgboost\nstreamlit run app.py", language="bash")
+        st.code("""
+# Install required libraries
+pip install streamlit pandas numpy plotly joblib scikit-learn xgboost
+
+# Run the dashboard
+streamlit run app.py
+        """, language="bash")
         
     with t2:
         st.markdown(f"""
@@ -180,16 +185,7 @@ elif menu == "📄 Tech Documentation":
         - **Algorithm:** XGBoost Regression v2.1
         - **Data Source:** PhonePe Pulse Official Dataset
         - **Accuracy:** 98% Predictive Confidence
-        - **UI Theme:** Sky Blue Professional Edition
-        """)
-        
-    with t3:
-        st.markdown(f"""
-        ### Candidate Details
-        - **Organization:** Labmentix
-        - **Role:** AI/ML Intern
-        - **Project:** Financial Transaction Forecasting
         """)
 
 st.divider()
-st.caption(f"© {datetime.now().year} | PhonePe Pulse Prediction Dashboard | Labmentix Submission")
+st.caption(f"© {datetime.now().year} | PhonePe Pulse Prediction Dashboard")

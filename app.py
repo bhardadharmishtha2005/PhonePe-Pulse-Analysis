@@ -9,6 +9,32 @@ from datetime import datetime
 # 1. ---------------- PAGE CONFIG ----------------
 st.set_page_config(page_title="PhonePe Pulse Analytics", page_icon="📈", layout="wide")
 
+st.set_page_config(page_title="PhonePe Pulse Analytics", page_icon="💎", layout="wide")
+
+st.markdown("""
+    <style>
+    .stApp { background-color: #FFFFFF; }
+    [data-testid="stSidebar"] { background-color: #F0F7FF; border-right: 1px solid #D1E3F8; min-width: 300px; }
+    h1, h2, h3 { color: #0083B0 !important; font-family: 'Inter', sans-serif; font-weight: 700; }
+    
+    /* Professional Metric Cards */
+    div[data-testid="stMetric"] {
+        background: #FFFFFF; border-radius: 12px; padding: 20px;
+        border: 1px solid #D1E3F8; box-shadow: 0 4px 10px rgba(0, 104, 201, 0.05);
+    }
+
+    /* Professional Sky Blue Button */
+    div.stButton > button:first-child {
+        background: linear-gradient(135deg, #00B4DB 0%, #0083B0 100%) !important;
+        color: white !important; border-radius: 10px !important; font-weight: 600 !important;
+        width: 100%; height: 3.5em; border: none; transition: 0.3s ease;
+    }
+    div.stButton > button:hover {
+        background: linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%) !important;
+        transform: translateY(-2px);
+    }
+    </style>
+    """, unsafe_allow_html=True)
 # 2. ---------------- DATA LOAD ----------------
 @st.cache_resource
 def load_data():

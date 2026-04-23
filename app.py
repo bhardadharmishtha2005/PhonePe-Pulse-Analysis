@@ -167,7 +167,7 @@ elif menu == "📄 Tech Documentation":
     st.markdown("---")
     
     # FIXED: Correct variable unpacking for 3 tabs
-    t1, t2, t3 = st.tabs(["🚀 Setup Guide", "🛠️ System Architecture"])
+    t1, t2 = st.tabs(["🚀 Setup Guide", "🛠️ System Architecture"])
     
     with t1:
         st.subheader("Installation & Deployment")

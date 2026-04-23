@@ -107,7 +107,7 @@ if menu == "📈 Advanced Analytics":
         st.plotly_chart(px.line(x=['2021', '2022', '2023', '2024'], y=[100, 145, 190, 260], 
                                 title="Adoption Trend", markers=True), use_container_width=True)
 
-elif menu == "🚀 Predictor Engine":
+if menu == "🚀 Predictor Engine":
     st.title("⚡ Transaction Prediction Engine")
     st.markdown("---")
     

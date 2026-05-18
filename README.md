@@ -1,4 +1,4 @@
-# PhonePe Pulse: Data Visualization & Prediction
+# PhonePe Pulse Analysis and Forecasting 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/14gPwLrwYVbAo06DT5QOJVftacdLBOAvi)
 
 ## Project Overview

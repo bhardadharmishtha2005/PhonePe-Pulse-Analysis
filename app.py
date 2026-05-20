@@ -157,16 +157,10 @@ elif menu == "📈 Advanced Analytics":
                                title="Top 5 Performing Regions",
                                color='Transactions', color_continuous_scale='Blues'), use_container_width=True)
     with m4:
+        with m4:
         # Adoption Line Chart with Markers
-        # 1. Group the real data dynamically by Year
-        yearly_trend = india_data.groupby('Year')['Transactions'].sum().reset_index()
-        
-        # 2. Feed the dynamic DataFrame into the Plotly line chart
-        st.plotly_chart(px.line(yearly_trend, 
-                                x='Year', 
-                                y='Transactions', 
-                                title="Dynamic Yearly Adoption Trend", 
-                                markers=True,
+        st.plotly_chart(px.line(x=['2021', '2022', '2023', '2024'], y=[100, 145, 190, 260], 
+                                title="Yearly Adoption Trend", markers=True,
                                 color_discrete_sequence=['#00B4DB']), use_container_width=True)
 
 elif menu == "📄 Tech Documentation":
